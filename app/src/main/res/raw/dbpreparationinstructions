@@ -1,0 +1,30 @@
+0. Convert ETE and ETD to UTF-8 (save in kate in UTF-8)
+
+1. S&R to get rid of all |
+
+2. sqlite3 temp.db
+
+CREATE TABLE EnglishTableTemp ( entryText TEXT, D_sum TEXT, emptyColumn TEXT);
+.import ETE.TXT
+
+Get error messages because some rows have ; in them not as separator. Get rid of ; there
+
+3. sqlite3 DIMDI.db
+
+CREATE TABLE EnglishTableTemp( entryText TEXT, D_sum TEXT, emptyColumn TEXT);
+CREATE TABLE EnglishTable( _id INTEGER PRIMARY KEY AUTOINCREMENT, entryText TEXT, D_sum TEXT);
+CREATE TABLE GermanTableTemp( entryText TEXT, D_sum TEXT, emptyColumn TEXT);
+CREATE TABLE GermanTable( _id INTEGER PRIMARY KEY AUTOINCREMENT, entryText TEXT, D_sum TEXT);
+
+.mode csv
+.separator ";"
+.import ETE.TXT EnglishTableTemp
+.import ETD.TXT GermanTableTemp
+
+INSERT INTO EnglishTable(entryText, D_sum) SELECT entryText, D_sum FROM EnglishTableTemp;
+INSERT INTO GermanTable(entryText, D_sum) SELECT entryText, D_sum FROM GermanTableTemp;
+
+DROP TABLE EnglishTableTemp;
+DROP TABLE GermanTableTemp;
+
+4.  sqlite3 dimdi.db "VACUUM;"
